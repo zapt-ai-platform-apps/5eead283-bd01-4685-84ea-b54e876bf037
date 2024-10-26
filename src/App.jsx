@@ -1,4 +1,4 @@
-import { createSignal, Show, onMount } from 'solid-js';
+import { createSignal, Show, onMount, createEffect } from 'solid-js';
 import { createEvent } from './supabaseClient';
 
 function App() {
@@ -62,13 +62,25 @@ function App() {
     setAudioUrl('');
     setResponseText('');
     try {
-      const result = await createEvent('chatgpt_request', {
+      const aiResult = await createEvent('chatgpt_request', {
         prompt: textInput(),
         response_type: 'text'
       });
 
-      setResponseText(result);
+      setResponseText(aiResult);
       setTextInput('');
+
+      // تحويل الرد إلى كلام وتشغيله تلقائيًا
+      const audioResult = await createEvent('text_to_speech', {
+        text: aiResult
+      });
+      setAudioUrl(audioResult);
+
+      // تشغيل الصوت تلقائيًا
+      const audio = new Audio(audioResult);
+      audio.play().catch((error) => {
+        console.error('Error playing audio:', error);
+      });
     } catch (error) {
       console.error('Error processing text:', error);
       setErrorMessage('حدث خطأ أثناء معالجة النص.');
@@ -77,29 +89,8 @@ function App() {
     }
   };
 
-  const handleTextToSpeech = async () => {
-    if (!responseText()) {
-      setErrorMessage('لا يوجد رد لتحويله إلى كلام.');
-      return;
-    }
-
-    setLoading(true);
-    setErrorMessage('');
-    try {
-      const result = await createEvent('text_to_speech', {
-        text: responseText()
-      });
-      setAudioUrl(result);
-    } catch (error) {
-      console.error('Error converting text to speech:', error);
-      setErrorMessage('حدث خطأ أثناء تحويل النص إلى كلام.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div class="h-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
       <div class="max-w-lg w-full bg-white rounded-3xl shadow-lg p-8">
         <div class="text-center mb-6">
           <h1 class="text-4xl font-extrabold mb-2 text-purple-700">مساعد المكفوفين</h1>
@@ -120,14 +111,14 @@ function App() {
               onClick={handleTextSubmit}
               disabled={loading() || isRecording()}
             >
-              {loading() ? 'جارٍ المعالجة...' : 'إرسال'}
+              {loading() && !isRecording() ? 'جارٍ المعالجة...' : 'إرسال'}
             </button>
             <button
               class={`flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                isRecording() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                isRecording() || loading() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
               }`}
               onClick={handleVoiceInput}
-              disabled={isRecording()}
+              disabled={isRecording() || loading()}
             >
               {isRecording() ? 'جارٍ التسجيل...' : 'تسجيل صوتي'}
             </button>
@@ -143,19 +134,8 @@ function App() {
             <h3 class="text-xl font-bold mb-2 text-purple-600 text-center">الرد:</h3>
             <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">{responseText()}</p>
 
-            <div class="mt-4 flex justify-center">
-              <button
-                class={`py-2 px-4 bg-green-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                  loading() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-                }`}
-                onClick={handleTextToSpeech}
-                disabled={loading()}
-              >
-                {loading() ? 'جارٍ التحميل...' : 'استمع للرد'}
-              </button>
-            </div>
-
             <Show when={audioUrl()}>
+              {/* مشغل الصوت لإعادة تشغيل الرد */}
               <div class="mt-4">
                 <audio controls src={audioUrl()} class="w-full" />
               </div>
