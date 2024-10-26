@@ -42,60 +42,6 @@ function App() {
     setCurrentPage('login');
   };
 
-  const recordAudio = () => {
-    if (!navigator.mediaDevices.getUserMedia) {
-      setErrorMessage('المتصفح لا يدعم تسجيل الصوت.');
-      return;
-    }
-
-    setLoading(true);
-    setErrorMessage('');
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      const mediaRecorder = new MediaRecorder(stream);
-      const audioChunks = [];
-
-      mediaRecorder.start();
-
-      mediaRecorder.addEventListener('dataavailable', event => {
-        audioChunks.push(event.data);
-      });
-
-      mediaRecorder.addEventListener('stop', async () => {
-        const audioBlob = new Blob(audioChunks);
-        const formData = new FormData();
-        formData.append('file', audioBlob, 'recording.webm');
-
-        try {
-          const response = await fetch('/api/processAudio', {
-            method: 'POST',
-            body: formData,
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            setResponseText(data.text);
-          } else {
-            setErrorMessage('حدث خطأ أثناء معالجة الصوت.');
-          }
-        } catch (error) {
-          console.error('Error processing audio:', error);
-          setErrorMessage('حدث خطأ أثناء معالجة الصوت.');
-        } finally {
-          setLoading(false);
-        }
-      });
-
-      setTimeout(() => {
-        mediaRecorder.stop();
-        stream.getTracks().forEach(track => track.stop());
-      }, 5000); // Record for 5 seconds
-    }).catch(error => {
-      console.error('Error accessing microphone:', error);
-      setErrorMessage('لم يتم الوصول إلى الميكروفون.');
-      setLoading(false);
-    });
-  };
-
   const handleTextSubmit = async () => {
     if (!textInput().trim()) {
       setErrorMessage('يرجى إدخال نص.');
@@ -149,15 +95,7 @@ function App() {
       >
         <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-6 text-center">
           <h1 class="text-2xl font-bold mb-4 text-purple-600">مساعد الذكاء الاصطناعي للمكفوفين</h1>
-          <p class="mb-6 text-gray-700">اختر طريقة التفاعل:</p>
           <div class="space-y-4">
-            <button
-              class={`w-full px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out cursor-pointer ${loading() ? 'opacity-50 cursor-not-allowed' : ''}`}
-              onClick={recordAudio}
-              disabled={loading()}
-            >
-              {loading() ? 'جارٍ التسجيل...' : 'ابدأ التسجيل'}
-            </button>
             <div class="relative">
               <input
                 type="text"
