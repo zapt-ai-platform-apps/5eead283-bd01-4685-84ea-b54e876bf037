@@ -9,6 +9,7 @@ function App() {
   const [loading, setLoading] = createSignal(false);
   const [audioUrl, setAudioUrl] = createSignal('');
   const [errorMessage, setErrorMessage] = createSignal('');
+  const [textInput, setTextInput] = createSignal('');
 
   const checkUserSignedIn = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -33,6 +34,7 @@ function App() {
     }
 
     setLoading(true);
+    setErrorMessage('');
     navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
       const mediaRecorder = new MediaRecorder(stream);
       const audioChunks = [];
@@ -79,6 +81,35 @@ function App() {
     });
   };
 
+  const handleTextSubmit = async () => {
+    if (!textInput().trim()) {
+      setErrorMessage('يرجى إدخال نص.');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const result = await createEvent('chatgpt_request', {
+        prompt: textInput(),
+        response_type: 'text'
+      });
+
+      // Convert the text response to speech
+      const audioResult = await createEvent('text_to_speech', {
+        text: result
+      });
+
+      setAudioUrl(audioResult);
+      setTextInput('');
+    } catch (error) {
+      console.error('Error processing text:', error);
+      setErrorMessage('حدث خطأ أثناء معالجة النص.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div class="min-h-screen bg-gray-100 p-4 flex items-center justify-center">
       <Show
@@ -108,14 +139,32 @@ function App() {
       >
         <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-6 text-center">
           <h1 class="text-2xl font-bold mb-4 text-purple-600">مساعد الذكاء الاصطناعي للمكفوفين</h1>
-          <p class="mb-6 text-gray-700">اضغط على الزر أدناه وتحدث لمدة 5 ثوانٍ</p>
-          <button
-            class={`w-full px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out cursor-pointer ${loading() ? 'opacity-50 cursor-not-allowed' : ''}`}
-            onClick={recordAudio}
-            disabled={loading()}
-          >
-            {loading() ? 'جارٍ التسجيل...' : 'ابدأ التسجيل'}
-          </button>
+          <p class="mb-6 text-gray-700">اختر طريقة التفاعل:</p>
+          <div class="space-y-4">
+            <button
+              class={`w-full px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out cursor-pointer ${loading() ? 'opacity-50 cursor-not-allowed' : ''}`}
+              onClick={recordAudio}
+              disabled={loading()}
+            >
+              {loading() ? 'جارٍ التسجيل...' : 'ابدأ التسجيل'}
+            </button>
+            <div class="relative">
+              <input
+                type="text"
+                placeholder="اكتب رسالتك هنا"
+                value={textInput()}
+                onInput={(e) => setTextInput(e.target.value)}
+                class="w-full p-3 pr-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-transparent box-border"
+              />
+              <button
+                class={`absolute inset-y-0 left-0 px-4 flex items-center text-white bg-blue-500 hover:bg-blue-600 rounded-r-lg cursor-pointer ${loading() ? 'opacity-50 cursor-not-allowed' : ''}`}
+                onClick={handleTextSubmit}
+                disabled={loading()}
+              >
+                إرسال
+              </button>
+            </div>
+          </div>
           <Show when={audioUrl()}>
             <div class="mt-6">
               <h3 class="text-lg font-bold mb-2 text-purple-600">الرد الصوتي</h3>
