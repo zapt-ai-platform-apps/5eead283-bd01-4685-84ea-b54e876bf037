@@ -8,7 +8,7 @@ function App() {
   const [responseText, setResponseText] = createSignal('');
   const [audioUrl, setAudioUrl] = createSignal('');
   const [isRecording, setIsRecording] = createSignal(false);
-  const [soundEnabled, setSoundEnabled] = createSignal(true);
+  const [soundEnabled, setSoundEnabled] = createSignal(false);
   let recognition;
 
   onMount(() => {
@@ -94,7 +94,7 @@ function App() {
 
   return (
     <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
-      <div class="max-w-lg w-full bg-white rounded-3xl shadow-lg p-8 h-full">
+      <div class="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-8 h-full">
         <div class="text-center mb-6">
           <h1 class="text-4xl font-extrabold mb-2 text-purple-700">Blind assistant</h1>
           <p class="text-lg text-gray-600">تفاعل مع الذكاء الاصطناعي باللغة العربية بسهولة.</p>
@@ -108,8 +108,8 @@ function App() {
           ></textarea>
           <div class="flex space-x-2">
             <button
-              class={`flex-1 py-3 bg-purple-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                loading() || isRecording() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              class={`flex-1 py-3 bg-purple-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer ${
+                loading() || isRecording() ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               onClick={handleTextSubmit}
               disabled={loading() || isRecording()}
@@ -117,8 +117,8 @@ function App() {
               {loading() && !isRecording() ? 'جارٍ المعالجة...' : 'إرسال'}
             </button>
             <button
-              class={`flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                isRecording() || loading() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+              class={`flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
+                isRecording() || loading() ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               onClick={handleVoiceInput}
               disabled={isRecording() || loading()}
