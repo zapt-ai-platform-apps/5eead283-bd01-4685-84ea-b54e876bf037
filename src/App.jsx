@@ -73,18 +73,25 @@ function App() {
       setResponseText(aiResult);
       setTextInput('');
 
-      // تحويل الرد إلى كلام وتشغيله تلقائيًا إذا كان الصوت مفعلاً
       if (soundEnabled()) {
+        // تحويل الرد إلى كلام وتشغيله تلقائيًا
         const audioResult = await createEvent('text_to_speech', {
           text: aiResult
         });
         setAudioUrl(audioResult);
 
-        // تشغيل الصوت تلقائيًا
         const audio = new Audio(audioResult);
+        audio.onended = () => {
+          // بعد انتهاء تشغيل الصوت، ابدأ التسجيل الصوتي تلقائيًا
+          handleVoiceInput();
+        };
         audio.play().catch((error) => {
           console.error('Error playing audio:', error);
+          // في حالة حدوث خطأ، يمكنك البدء بالتسجيل مباشرةً
+          handleVoiceInput();
         });
+      } else {
+        // إذا كان الصوت غير مفعّل، لا تقم ببدء التسجيل تلقائيًا
       }
     } catch (error) {
       console.error('Error processing text:', error);
