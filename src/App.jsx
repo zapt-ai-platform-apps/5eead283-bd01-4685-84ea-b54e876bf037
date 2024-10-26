@@ -7,9 +7,9 @@ function App() {
   const [user, setUser] = createSignal(null);
   const [currentPage, setCurrentPage] = createSignal('login');
   const [loading, setLoading] = createSignal(false);
-  const [audioUrl, setAudioUrl] = createSignal('');
   const [errorMessage, setErrorMessage] = createSignal('');
   const [textInput, setTextInput] = createSignal('');
+  const [responseText, setResponseText] = createSignal('');
 
   const checkUserSignedIn = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -19,7 +19,22 @@ function App() {
     }
   };
 
-  onMount(checkUserSignedIn);
+  onMount(() => {
+    checkUserSignedIn();
+    const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        setCurrentPage('homePage');
+      } else {
+        setUser(null);
+        setCurrentPage('login');
+      }
+    });
+
+    return () => {
+      authListener.unsubscribe();
+    };
+  });
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -58,7 +73,7 @@ function App() {
 
           if (response.ok) {
             const data = await response.json();
-            setAudioUrl(data.audioUrl);
+            setResponseText(data.text);
           } else {
             setErrorMessage('حدث خطأ أثناء معالجة الصوت.');
           }
@@ -95,12 +110,7 @@ function App() {
         response_type: 'text'
       });
 
-      // Convert the text response to speech
-      const audioResult = await createEvent('text_to_speech', {
-        text: result
-      });
-
-      setAudioUrl(audioResult);
+      setResponseText(result);
       setTextInput('');
     } catch (error) {
       console.error('Error processing text:', error);
@@ -165,10 +175,10 @@ function App() {
               </button>
             </div>
           </div>
-          <Show when={audioUrl()}>
-            <div class="mt-6">
-              <h3 class="text-lg font-bold mb-2 text-purple-600">الرد الصوتي</h3>
-              <audio controls src={audioUrl()} class="w-full" />
+          <Show when={responseText()}>
+            <div class="mt-6 text-left">
+              <h3 class="text-lg font-bold mb-2 text-purple-600">الرد:</h3>
+              <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">{responseText()}</p>
             </div>
           </Show>
           <Show when={errorMessage()}>

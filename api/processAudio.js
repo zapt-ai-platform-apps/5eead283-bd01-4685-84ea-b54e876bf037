@@ -32,11 +32,12 @@ export default async function handler(req, res) {
       const fs = await import('fs');
       const audioData = fs.readFileSync(file.filepath, { encoding: 'base64' });
 
+      // معالجة الصوت والحصول على رد نصي
       const result = await createEvent('process_audio', {
         audioData
       });
 
-      res.status(200).json({ audioUrl: result });
+      res.status(200).json({ text: result });
     } catch (error) {
       console.error('Error processing audio:', error);
       res.status(500).json({ error: 'حدث خطأ أثناء معالجة الصوت.' });
