@@ -93,7 +93,7 @@ function App() {
     <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
       <div class="max-w-lg w-full bg-white rounded-3xl shadow-lg p-8">
         <div class="text-center mb-6">
-          <h1 class="text-4xl font-extrabold mb-2 text-purple-700">مساعد المكفوفين</h1>
+          <h1 class="text-4xl font-extrabold mb-2 text-purple-700">Blind assistant</h1>
           <p class="text-lg text-gray-600">تفاعل مع الذكاء الاصطناعي باللغة العربية بسهولة.</p>
         </div>
         <div class="space-y-4">
