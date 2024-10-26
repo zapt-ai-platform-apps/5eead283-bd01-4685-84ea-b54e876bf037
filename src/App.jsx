@@ -32,39 +32,39 @@ function App() {
   };
 
   return (
-    <div class="h-full bg-gray-100 p-4 flex items-center justify-center">
-      <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-6 text-center">
-        <h1 class="text-3xl font-bold mb-4 text-purple-600">مرحبًا بك في مساعد المكفوفين</h1>
-        <p class="mb-6 text-lg text-gray-700">يتيح لك هذا التطبيق التفاعل مع الذكاء الاصطناعي باللغة العربية.</p>
+    <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
+      <div class="max-w-lg w-full bg-white rounded-3xl shadow-lg p-8">
+        <div class="text-center mb-6">
+          <h1 class="text-4xl font-extrabold mb-2 text-purple-700">مساعد المكفوفين</h1>
+          <p class="text-lg text-gray-600">تفاعل مع الذكاء الاصطناعي باللغة العربية بسهولة.</p>
+        </div>
         <div class="space-y-4">
-          <div class="relative">
-            <input
-              type="text"
-              placeholder="اكتب رسالتك هنا"
-              value={textInput()}
-              onInput={(e) => setTextInput(e.target.value)}
-              class="w-full p-3 pr-16 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-transparent box-border"
-            />
-            <button
-              class={`absolute inset-y-0 left-0 px-4 flex items-center text-white bg-blue-500 hover:bg-blue-600 rounded-r-lg ${
-                loading() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
-              }`}
-              onClick={handleTextSubmit}
-              disabled={loading()}
-            >
-              {loading() ? 'جارٍ الإرسال...' : 'إرسال'}
-            </button>
-          </div>
+          <textarea
+            placeholder="اكتب رسالتك هنا..."
+            value={textInput()}
+            onInput={(e) => setTextInput(e.target.value)}
+            class="w-full h-32 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent box-border resize-none text-gray-800"
+          ></textarea>
+          <button
+            class={`w-full py-3 bg-purple-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              loading() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+            }`}
+            onClick={handleTextSubmit}
+            disabled={loading()}
+          >
+            {loading() ? 'جارٍ المعالجة...' : 'إرسال'}
+          </button>
         </div>
 
+        <Show when={errorMessage()}>
+          <div class="mt-4 text-red-500 text-center">{errorMessage()}</div>
+        </Show>
+
         <Show when={responseText()}>
-          <div class="mt-6 text-left">
-            <h3 class="text-lg font-bold mb-2 text-purple-600">الرد:</h3>
+          <div class="mt-8 bg-gray-100 p-6 rounded-xl shadow-inner">
+            <h3 class="text-xl font-bold mb-2 text-purple-600 text-center">الرد:</h3>
             <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">{responseText()}</p>
           </div>
-        </Show>
-        <Show when={errorMessage()}>
-          <div class="mt-4 text-red-500">{errorMessage()}</div>
         </Show>
       </div>
     </div>

@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* تخصيصات إضافية */
+
+body {
+  font-family: 'Tahoma', sans-serif;
+}
