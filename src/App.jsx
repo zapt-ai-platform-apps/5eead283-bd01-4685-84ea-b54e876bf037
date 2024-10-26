@@ -21,6 +21,9 @@ function App() {
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         setTextInput(transcript);
+        recognition.stop();
+        setIsRecording(false);
+        handleTextSubmit();
       };
 
       recognition.onerror = (event) => {
@@ -112,10 +115,10 @@ function App() {
           <div class="flex space-x-2">
             <button
               class={`flex-1 py-3 bg-purple-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 ${
-                loading() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                loading() || isRecording() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
               }`}
               onClick={handleTextSubmit}
-              disabled={loading()}
+              disabled={loading() || isRecording()}
             >
               {loading() ? 'جارٍ المعالجة...' : 'إرسال'}
             </button>
