@@ -8,6 +8,7 @@ function App() {
   const [responseText, setResponseText] = createSignal('');
   const [audioUrl, setAudioUrl] = createSignal('');
   const [isRecording, setIsRecording] = createSignal(false);
+  const [soundEnabled, setSoundEnabled] = createSignal(true);
   let recognition;
 
   onMount(() => {
@@ -70,17 +71,19 @@ function App() {
       setResponseText(aiResult);
       setTextInput('');
 
-      // تحويل الرد إلى كلام وتشغيله تلقائيًا
-      const audioResult = await createEvent('text_to_speech', {
-        text: aiResult
-      });
-      setAudioUrl(audioResult);
+      // تحويل الرد إلى كلام وتشغيله تلقائيًا إذا كان الصوت مفعلاً
+      if (soundEnabled()) {
+        const audioResult = await createEvent('text_to_speech', {
+          text: aiResult
+        });
+        setAudioUrl(audioResult);
 
-      // تشغيل الصوت تلقائيًا
-      const audio = new Audio(audioResult);
-      audio.play().catch((error) => {
-        console.error('Error playing audio:', error);
-      });
+        // تشغيل الصوت تلقائيًا
+        const audio = new Audio(audioResult);
+        audio.play().catch((error) => {
+          console.error('Error playing audio:', error);
+        });
+      }
     } catch (error) {
       console.error('Error processing text:', error);
       setErrorMessage('حدث خطأ أثناء معالجة النص.');
@@ -91,7 +94,7 @@ function App() {
 
   return (
     <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
-      <div class="max-w-lg w-full bg-white rounded-3xl shadow-lg p-8">
+      <div class="max-w-lg w-full bg-white rounded-3xl shadow-lg p-8 h-full">
         <div class="text-center mb-6">
           <h1 class="text-4xl font-extrabold mb-2 text-purple-700">Blind assistant</h1>
           <p class="text-lg text-gray-600">تفاعل مع الذكاء الاصطناعي باللغة العربية بسهولة.</p>
@@ -123,6 +126,18 @@ function App() {
               {isRecording() ? 'جارٍ التسجيل...' : 'تسجيل صوتي'}
             </button>
           </div>
+        </div>
+
+        <div class="mt-4 flex items-center">
+          <label class="flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              checked={soundEnabled()}
+              onChange={(e) => setSoundEnabled(e.target.checked)}
+              class="form-checkbox h-5 w-5 text-purple-600 cursor-pointer"
+            />
+            <span class="mr-2 text-gray-700">تشغيل الصوت عند الرد</span>
+          </label>
         </div>
 
         <Show when={errorMessage()}>
