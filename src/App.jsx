@@ -1,4 +1,4 @@
-import { createSignal, Show, onMount, createEffect } from 'solid-js';
+import { createSignal, Show, onMount } from 'solid-js';
 import { createEvent } from './supabaseClient';
 
 function App() {
@@ -133,13 +133,6 @@ function App() {
           <div class="mt-8 bg-gray-100 p-6 rounded-xl shadow-inner">
             <h3 class="text-xl font-bold mb-2 text-purple-600 text-center">الرد:</h3>
             <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">{responseText()}</p>
-
-            <Show when={audioUrl()}>
-              {/* مشغل الصوت لإعادة تشغيل الرد */}
-              <div class="mt-4">
-                <audio controls src={audioUrl()} class="w-full" />
-              </div>
-            </Show>
           </div>
         </Show>
       </div>
