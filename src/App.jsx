@@ -4,6 +4,7 @@ import { createEvent } from './supabaseClient';
 function App() {
   const [loading, setLoading] = createSignal(false);
   const [errorMessage, setErrorMessage] = createSignal('');
+  const [successMessage, setSuccessMessage] = createSignal('');
   const [textInput, setTextInput] = createSignal('');
   const [responseText, setResponseText] = createSignal('');
   const [audioUrl, setAudioUrl] = createSignal('');
@@ -60,6 +61,7 @@ function App() {
 
     setLoading(true);
     setErrorMessage('');
+    setSuccessMessage('');
     setAudioUrl('');
     setResponseText('');
     try {
@@ -89,6 +91,18 @@ function App() {
       setErrorMessage('حدث خطأ أثناء معالجة النص.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCopyResponse = async () => {
+    try {
+      await navigator.clipboard.writeText(responseText());
+      setSuccessMessage('تم نسخ الرد إلى الحافظة.');
+      // مسح الرسالة بعد 3 ثوانٍ
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err) {
+      console.error('Error copying text: ', err);
+      setErrorMessage('حدث خطأ أثناء نسخ الرد.');
     }
   };
 
@@ -144,10 +158,20 @@ function App() {
           <div class="mt-4 text-red-500 text-center">{errorMessage()}</div>
         </Show>
 
+        <Show when={successMessage()}>
+          <div class="mt-4 text-green-500 text-center">{successMessage()}</div>
+        </Show>
+
         <Show when={responseText()}>
           <div class="mt-8 bg-gray-100 p-6 rounded-xl shadow-inner">
             <h3 class="text-xl font-bold mb-2 text-purple-600 text-center">الرد:</h3>
             <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">{responseText()}</p>
+            <button
+              class="mt-4 py-2 px-6 bg-green-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+              onClick={handleCopyResponse}
+            >
+              نسخ الرد
+            </button>
           </div>
         </Show>
       </div>
