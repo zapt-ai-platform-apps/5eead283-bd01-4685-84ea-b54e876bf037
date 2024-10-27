@@ -79,7 +79,7 @@ function App() {
       setResponseText(aiResult);
       setTextInput('');
 
-      if (soundEnabled() || inputFromVoice()) {
+      if (inputFromVoice() && soundEnabled()) {
         const audioResult = await createEvent('text_to_speech', {
           text: aiResult,
         });
@@ -93,7 +93,7 @@ function App() {
           setIsPlaying(false);
           setAudioObject(null);
 
-          // Start recording automatically after the audio ends if sound is enabled
+          // Start recording automatically after the audio ends if soundEnabled is true
           if (soundEnabled()) {
             handleVoiceInput();
           }
@@ -105,7 +105,7 @@ function App() {
           setIsPlaying(false);
           setAudioObject(null);
 
-          // Start recording automatically after the audio ends if sound is enabled
+          // Start recording automatically after the audio ends if soundEnabled is true
           if (soundEnabled()) {
             handleVoiceInput();
           }
@@ -117,13 +117,13 @@ function App() {
           setIsPlaying(false);
           setAudioObject(null);
 
-          // Start recording automatically after the audio ends if sound is enabled
+          // Start recording automatically after the audio ends if soundEnabled is true
           if (soundEnabled()) {
             handleVoiceInput();
           }
         });
       } else {
-        // If sound is not enabled, do not start recording automatically
+        // If not playing audio, reset inputFromVoice
         setInputFromVoice(false);
       }
     } catch (error) {
@@ -194,15 +194,14 @@ function App() {
             <ul class="list-disc list-inside text-gray-800 space-y-2">
               <li>للاستخدام الصوتي، اضغط على زر "تسجيل صوتي" وتحدث بوضوح.</li>
               <li>
-                لتفعيل الصوت عند الرد، قم بتفعيل خيار "تشغيل الصوت عند الرد".
+                للتحكم في تشغيل الصوت عند الرد، قم بتفعيل خيار "تشغيل الصوت عند الرد".
               </li>
               <li>
-                عند استخدام التسجيل الصوتي، سيتم تشغيل الرد الصوتي تلقائيًا إذا كان خيار "تشغيل الصوت عند الرد" مفعلاً.
+                عند استخدام التسجيل الصوتي، يمكن تشغيل الرد الصوتي تلقائيًا إذا كان خيار "تشغيل الصوت عند الرد" مفعلاً.
               </li>
               <li>يمكنك نسخ الرد بالضغط على زر "نسخ الرد".</li>
               <li>
-                للتحكم في الصوت أثناء الرد، استخدم زر "إيقاف الصوت" أو "تشغيل
-                الصوت".
+                للتحكم في الصوت أثناء الرد، استخدم زر "إيقاف الصوت" أو "تشغيل الصوت".
               </li>
             </ul>
             <button
