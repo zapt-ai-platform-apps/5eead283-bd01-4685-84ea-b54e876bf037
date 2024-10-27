@@ -12,6 +12,7 @@ function App() {
   const [isRecording, setIsRecording] = createSignal(false);
   const [soundEnabled, setSoundEnabled] = createSignal(false);
   const [isPlaying, setIsPlaying] = createSignal(false);
+  const [showInstructions, setShowInstructions] = createSignal(false);
   let recognition;
 
   onMount(() => {
@@ -76,7 +77,6 @@ function App() {
       setTextInput('');
 
       if (soundEnabled()) {
-        // تحويل الرد إلى كلام وتشغيله تلقائيًا
         const audioResult = await createEvent('text_to_speech', {
           text: aiResult
         });
@@ -89,7 +89,6 @@ function App() {
         audio.onended = () => {
           setIsPlaying(false);
           setAudioObject(null);
-          // بعد انتهاء تشغيل الصوت، ابدأ التسجيل الصوتي تلقائيًا
           handleVoiceInput();
         };
 
@@ -98,7 +97,6 @@ function App() {
           setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
           setIsPlaying(false);
           setAudioObject(null);
-          // في حالة حدوث خطأ، يمكنك البدء بالتسجيل مباشرةً
           handleVoiceInput();
         };
 
@@ -107,11 +105,8 @@ function App() {
           setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
           setIsPlaying(false);
           setAudioObject(null);
-          // في حالة حدوث خطأ، يمكنك البدء بالتسجيل مباشرةً
           handleVoiceInput();
         });
-      } else {
-        // إذا كان الصوت غير مفعّل، لا تقم ببدء التسجيل تلقائيًا
       }
     } catch (error) {
       console.error('Error processing text:', error);
@@ -125,7 +120,6 @@ function App() {
     try {
       await navigator.clipboard.writeText(responseText());
       setSuccessMessage('تم نسخ الرد إلى الحافظة.');
-      // مسح الرسالة بعد 3 ثوانٍ
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Error copying text: ', err);
@@ -145,13 +139,47 @@ function App() {
     }
   };
 
+  const toggleInstructions = () => {
+    setShowInstructions(!showInstructions());
+  };
+
   return (
-    <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
+    <div class="h-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
       <div class="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-8 h-full">
-        <div class="text-center mb-6">
-          <h1 class="text-4xl font-extrabold mb-2 text-purple-700">Blind Assistant</h1>
-          <p class="text-lg text-gray-600">تفاعل مع الذكاء الاصطناعي باللغة العربية بسهولة.</p>
+        <div class="flex justify-between items-center mb-6">
+          <div class="text-center">
+            <h1 class="text-4xl font-extrabold mb-2 text-purple-700">Blind Assistant</h1>
+            <p class="text-lg text-gray-600">تفاعل مع الذكاء الاصطناعي باللغة العربية بسهولة.</p>
+          </div>
+          <button
+            class="text-purple-700 font-semibold cursor-pointer"
+            onClick={toggleInstructions}
+          >
+            كيفية الاستخدام
+          </button>
         </div>
+
+        <Show when={showInstructions()}>
+          <div class="mb-6 p-4 bg-gray-100 rounded-lg shadow-inner overflow-y-auto">
+            <h2 class="text-2xl font-bold mb-4 text-purple-600">كيفية الاستخدام</h2>
+            <p class="text-gray-800 leading-relaxed mb-2">
+              يمكنك التفاعل مع الذكاء الاصطناعي عن طريق كتابة استفسارك في مربع النص أو استخدام ميزة التسجيل الصوتي.
+            </p>
+            <ul class="list-disc list-inside text-gray-800 space-y-2">
+              <li>للاستخدام الصوتي، اضغط على زر "تسجيل صوتي" وتحدث بوضوح.</li>
+              <li>لتفعيل الصوت عند الرد، قم بتفعيل خيار "تشغيل الصوت عند الرد".</li>
+              <li>يمكنك نسخ الرد بالضغط على زر "نسخ الرد".</li>
+              <li>للتحكم في الصوت أثناء الرد، استخدم زر "إيقاف الصوت" أو "تشغيل الصوت".</li>
+            </ul>
+            <button
+              class="mt-4 py-2 px-6 bg-red-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
+              onClick={toggleInstructions}
+            >
+              إغلاق
+            </button>
+          </div>
+        </Show>
+
         <div class="space-y-4">
           <textarea
             placeholder="اكتب رسالتك هنا..."
