@@ -13,6 +13,7 @@ function App() {
   const [soundEnabled, setSoundEnabled] = createSignal(false);
   const [isPlaying, setIsPlaying] = createSignal(false);
   const [showInstructions, setShowInstructions] = createSignal(false);
+  const [inputFromVoice, setInputFromVoice] = createSignal(false);
   let recognition;
 
   onMount(() => {
@@ -28,6 +29,7 @@ function App() {
         setTextInput(transcript);
         recognition.stop();
         setIsRecording(false);
+        setInputFromVoice(true);
         handleTextSubmit();
       };
 
@@ -76,7 +78,7 @@ function App() {
       setResponseText(aiResult);
       setTextInput('');
 
-      if (soundEnabled()) {
+      if (soundEnabled() || inputFromVoice()) {
         const audioResult = await createEvent('text_to_speech', {
           text: aiResult
         });
@@ -89,7 +91,10 @@ function App() {
         audio.onended = () => {
           setIsPlaying(false);
           setAudioObject(null);
-          handleVoiceInput();
+          setInputFromVoice(false);
+          if (inputFromVoice()) {
+            handleVoiceInput();
+          }
         };
 
         audio.onerror = (e) => {
@@ -97,7 +102,10 @@ function App() {
           setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
           setIsPlaying(false);
           setAudioObject(null);
-          handleVoiceInput();
+          setInputFromVoice(false);
+          if (inputFromVoice()) {
+            handleVoiceInput();
+          }
         };
 
         audio.play().catch((error) => {
@@ -105,12 +113,18 @@ function App() {
           setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
           setIsPlaying(false);
           setAudioObject(null);
-          handleVoiceInput();
+          setInputFromVoice(false);
+          if (inputFromVoice()) {
+            handleVoiceInput();
+          }
         });
+      } else {
+        setInputFromVoice(false);
       }
     } catch (error) {
       console.error('Error processing text:', error);
       setErrorMessage('حدث خطأ أثناء معالجة النص.');
+      setInputFromVoice(false);
     } finally {
       setLoading(false);
     }
@@ -144,7 +158,7 @@ function App() {
   };
 
   return (
-    <div class="h-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
       <div class="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-8 h-full">
         <div class="flex justify-between items-center mb-6">
           <div class="text-center">
@@ -168,6 +182,7 @@ function App() {
             <ul class="list-disc list-inside text-gray-800 space-y-2">
               <li>للاستخدام الصوتي، اضغط على زر "تسجيل صوتي" وتحدث بوضوح.</li>
               <li>لتفعيل الصوت عند الرد، قم بتفعيل خيار "تشغيل الصوت عند الرد".</li>
+              <li>عند استخدام التسجيل الصوتي، سيتم تشغيل الرد الصوتي تلقائيًا.</li>
               <li>يمكنك نسخ الرد بالضغط على زر "نسخ الرد".</li>
               <li>للتحكم في الصوت أثناء الرد، استخدم زر "إيقاف الصوت" أو "تشغيل الصوت".</li>
             </ul>
