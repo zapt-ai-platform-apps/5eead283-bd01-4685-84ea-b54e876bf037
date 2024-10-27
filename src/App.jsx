@@ -93,8 +93,10 @@ function App() {
           setIsPlaying(false);
           setAudioObject(null);
 
-          // Start recording automatically after the audio ends
-          handleVoiceInput();
+          // Start recording automatically after the audio ends if sound is enabled
+          if (soundEnabled()) {
+            handleVoiceInput();
+          }
         };
 
         audio.onerror = (e) => {
@@ -103,8 +105,10 @@ function App() {
           setIsPlaying(false);
           setAudioObject(null);
 
-          // Start recording automatically even if there's an error
-          handleVoiceInput();
+          // Start recording automatically after the audio ends if sound is enabled
+          if (soundEnabled()) {
+            handleVoiceInput();
+          }
         };
 
         audio.play().catch((error) => {
@@ -113,8 +117,10 @@ function App() {
           setIsPlaying(false);
           setAudioObject(null);
 
-          // Start recording automatically even if there's an error
-          handleVoiceInput();
+          // Start recording automatically after the audio ends if sound is enabled
+          if (soundEnabled()) {
+            handleVoiceInput();
+          }
         });
       } else {
         // If sound is not enabled, do not start recording automatically
@@ -191,7 +197,7 @@ function App() {
                 لتفعيل الصوت عند الرد، قم بتفعيل خيار "تشغيل الصوت عند الرد".
               </li>
               <li>
-                عند استخدام التسجيل الصوتي، سيتم تشغيل الرد الصوتي تلقائيًا.
+                عند استخدام التسجيل الصوتي، سيتم تشغيل الرد الصوتي تلقائيًا إذا كان خيار "تشغيل الصوت عند الرد" مفعلاً.
               </li>
               <li>يمكنك نسخ الرد بالضغط على زر "نسخ الرد".</li>
               <li>
