@@ -8,8 +8,10 @@ function App() {
   const [textInput, setTextInput] = createSignal('');
   const [responseText, setResponseText] = createSignal('');
   const [audioUrl, setAudioUrl] = createSignal('');
+  const [audioObject, setAudioObject] = createSignal(null);
   const [isRecording, setIsRecording] = createSignal(false);
   const [soundEnabled, setSoundEnabled] = createSignal(false);
+  const [isPlaying, setIsPlaying] = createSignal(false);
   let recognition;
 
   onMount(() => {
@@ -81,12 +83,30 @@ function App() {
         setAudioUrl(audioResult);
 
         const audio = new Audio(audioResult);
+        setAudioObject(audio);
+        setIsPlaying(true);
+
         audio.onended = () => {
+          setIsPlaying(false);
+          setAudioObject(null);
           // بعد انتهاء تشغيل الصوت، ابدأ التسجيل الصوتي تلقائيًا
           handleVoiceInput();
         };
+
+        audio.onerror = (e) => {
+          console.error('Error playing audio:', e);
+          setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
+          setIsPlaying(false);
+          setAudioObject(null);
+          // في حالة حدوث خطأ، يمكنك البدء بالتسجيل مباشرةً
+          handleVoiceInput();
+        };
+
         audio.play().catch((error) => {
           console.error('Error playing audio:', error);
+          setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
+          setIsPlaying(false);
+          setAudioObject(null);
           // في حالة حدوث خطأ، يمكنك البدء بالتسجيل مباشرةً
           handleVoiceInput();
         });
@@ -113,11 +133,23 @@ function App() {
     }
   };
 
+  const handleAudioControl = () => {
+    if (audioObject()) {
+      if (isPlaying()) {
+        audioObject().pause();
+        setIsPlaying(false);
+      } else {
+        audioObject().play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
   return (
     <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
       <div class="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-8 h-full">
         <div class="text-center mb-6">
-          <h1 class="text-4xl font-extrabold mb-2 text-purple-700">Blind assistant</h1>
+          <h1 class="text-4xl font-extrabold mb-2 text-purple-700">Blind Assistant</h1>
           <p class="text-lg text-gray-600">تفاعل مع الذكاء الاصطناعي باللغة العربية بسهولة.</p>
         </div>
         <div class="space-y-4">
@@ -178,6 +210,17 @@ function App() {
               onClick={handleCopyResponse}
             >
               نسخ الرد
+            </button>
+          </div>
+        </Show>
+
+        <Show when={audioObject()}>
+          <div class="mt-4 flex justify-center">
+            <button
+              class="py-2 px-6 bg-blue-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              onClick={handleAudioControl}
+            >
+              {isPlaying() ? 'إيقاف الصوت' : 'تشغيل الصوت'}
             </button>
           </div>
         </Show>
