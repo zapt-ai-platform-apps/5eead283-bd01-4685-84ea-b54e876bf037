@@ -71,8 +71,9 @@ function App() {
     setAudioUrl('');
     setResponseText('');
     try {
+      const prompt = `يرجى الإجابة على السؤال التالي باللغة العربية الفصحى وبطريقة جذابة ومبسطة: ${textInput()}`;
       const aiResult = await createEvent('chatgpt_request', {
-        prompt: textInput(),
+        prompt: prompt,
         response_type: 'text',
       });
 
@@ -197,7 +198,8 @@ function App() {
                 للتحكم في تشغيل الصوت عند الرد، قم بتفعيل خيار "تشغيل الصوت عند الرد".
               </li>
               <li>
-                عند استخدام التسجيل الصوتي، يمكن تشغيل الرد الصوتي تلقائيًا إذا كان خيار "تشغيل الصوت عند الرد" مفعلاً.
+                عند استخدام التسجيل الصوتي، يمكن تشغيل الرد الصوتي تلقائيًا إذا
+                كان خيار "تشغيل الصوت عند الرد" مفعلاً.
               </li>
               <li>يمكنك نسخ الرد بالضغط على زر "نسخ الرد".</li>
               <li>
@@ -263,7 +265,7 @@ function App() {
         </Show>
 
         <Show when={responseText()}>
-          <div class="mt-8 bg-gray-100 p-6 rounded-xl shadow-inner">
+          <div class="mt-8 bg-gradient-to-r from-purple-200 to-blue-200 p-6 rounded-xl shadow-inner">
             <h3 class="text-xl font-bold mb-2 text-purple-600 text-center">
               الرد:
             </h3>

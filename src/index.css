@@ -6,3 +6,8 @@
 body {
   font-family: 'Tahoma', sans-serif;
 }
+
+/* تحسين مظهر الردود */
+.bg-response {
+  background: linear-gradient(to right, #e0c3fc, #8ec5fc);
+}
