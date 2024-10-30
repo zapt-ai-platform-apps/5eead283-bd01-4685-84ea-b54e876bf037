@@ -10,7 +10,6 @@ function App() {
   const [audioUrl, setAudioUrl] = createSignal('');
   const [audioObject, setAudioObject] = createSignal(null);
   const [isRecording, setIsRecording] = createSignal(false);
-  const [soundEnabled, setSoundEnabled] = createSignal(false);
   const [isPlaying, setIsPlaying] = createSignal(false);
   const [showInstructions, setShowInstructions] = createSignal(false);
   const [inputFromVoice, setInputFromVoice] = createSignal(false);
@@ -80,57 +79,48 @@ function App() {
       setResponseText(aiResult);
       setTextInput('');
 
-      if ((inputFromVoice() && soundEnabled()) || (!soundEnabled())) {
-        const audioResult = await createEvent('text_to_speech', {
-          text: aiResult,
-        });
-        setAudioUrl(audioResult);
+      const audioResult = await createEvent('text_to_speech', {
+        text: aiResult,
+      });
+      setAudioUrl(audioResult);
 
-        if (inputFromVoice() && soundEnabled()) {
-          const audio = new Audio(audioResult);
-          setAudioObject(audio);
-          setIsPlaying(true);
+      const audio = new Audio(audioResult);
+      setAudioObject(audio);
+      setIsPlaying(true);
 
-          audio.onended = () => {
-            setIsPlaying(false);
-            setAudioObject(null);
-
-            if (soundEnabled()) {
-              handleVoiceInput();
-            }
-          };
-
-          audio.onerror = (e) => {
-            console.error('Error playing audio:', e);
-            setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
-            setIsPlaying(false);
-            setAudioObject(null);
-
-            if (soundEnabled()) {
-              handleVoiceInput();
-            }
-          };
-
-          audio.play().catch((error) => {
-            console.error('Error playing audio:', error);
-            setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
-            setIsPlaying(false);
-            setAudioObject(null);
-
-            if (soundEnabled()) {
-              handleVoiceInput();
-            }
-          });
+      audio.onended = () => {
+        setIsPlaying(false);
+        setAudioObject(null);
+        if (inputFromVoice()) {
+          handleVoiceInput();
         }
-      } else {
-        setInputFromVoice(false);
-      }
+      };
+
+      audio.onerror = (e) => {
+        console.error('Error playing audio:', e);
+        setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
+        setIsPlaying(false);
+        setAudioObject(null);
+        if (inputFromVoice()) {
+          handleVoiceInput();
+        }
+      };
+
+      audio.play().catch((error) => {
+        console.error('Error playing audio:', error);
+        setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
+        setIsPlaying(false);
+        setAudioObject(null);
+        if (inputFromVoice()) {
+          handleVoiceInput();
+        }
+      });
     } catch (error) {
       console.error('Error processing text:', error);
       setErrorMessage('حدث خطأ أثناء معالجة النص.');
-      setInputFromVoice(false);
     } finally {
       setLoading(false);
+      setInputFromVoice(false);
     }
   };
 
@@ -218,21 +208,12 @@ function App() {
                 للاستخدام الصوتي، اضغط على زر "تسجيل صوتي" وتحدث بوضوح.
               </li>
               <li>
-                للتحكم في تشغيل الصوت عند الرد، قم بتفعيل خيار "تشغيل الصوت عند
-                الرد".
-              </li>
-              <li>
-                عند استخدام التسجيل الصوتي، يمكن تشغيل الرد الصوتي تلقائيًا إذا
-                كان خيار "تشغيل الصوت عند الرد" مفعلاً.
+                عند استخدام التسجيل الصوتي، يتم تشغيل الرد الصوتي تلقائيًا.
               </li>
               <li>يمكنك نسخ الرد بالضغط على زر "نسخ الرد".</li>
               <li>
                 للتحكم في الصوت أثناء الرد، استخدم زر "إيقاف الصوت" أو "تشغيل
                 الصوت".
-              </li>
-              <li>
-                إذا كان خيار "تشغيل الصوت عند الرد" غير مفعلاً، يمكنك الاستماع
-                للرد باستخدام زر "استمع للرد".
               </li>
             </ul>
             <button
@@ -254,9 +235,7 @@ function App() {
           <div class="flex space-x-2">
             <button
               class={`flex-1 py-3 bg-purple-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer ${
-                loading() || isRecording()
-                  ? 'opacity-50 cursor-not-allowed'
-                  : ''
+                loading() || isRecording() ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               onClick={handleTextSubmit}
               disabled={loading() || isRecording()}
@@ -265,9 +244,7 @@ function App() {
             </button>
             <button
               class={`flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
-                isRecording() || loading()
-                  ? 'opacity-50 cursor-not-allowed'
-                  : ''
+                isRecording() || loading() ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               onClick={handleVoiceInput}
               disabled={isRecording() || loading()}
@@ -275,18 +252,6 @@ function App() {
               {isRecording() ? 'جارٍ التسجيل...' : 'تسجيل صوتي'}
             </button>
           </div>
-        </div>
-
-        <div class="mt-4 flex items-center">
-          <label class="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={soundEnabled()}
-              onChange={(e) => setSoundEnabled(e.target.checked)}
-              class="form-checkbox h-5 w-5 text-purple-600 cursor-pointer"
-            />
-            <span class="mr-2 text-gray-700">تشغيل الصوت عند الرد</span>
-          </label>
         </div>
 
         <Show when={errorMessage()}>
@@ -312,29 +277,16 @@ function App() {
               >
                 نسخ الرد
               </button>
-              <Show when={!soundEnabled()}>
-                <button
-                  class={`flex-1 py-2 px-6 bg-blue-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
-                    loading() ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                  onClick={handleAudioControl}
-                  disabled={loading()}
-                >
-                  {isPlaying() ? 'إيقاف الصوت' : 'استمع للرد'}
-                </button>
-              </Show>
+              <button
+                class={`flex-1 py-2 px-6 bg-blue-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
+                  loading() ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                onClick={handleAudioControl}
+                disabled={loading()}
+              >
+                {isPlaying() ? 'إيقاف الصوت' : 'تشغيل الصوت'}
+              </button>
             </div>
-          </div>
-        </Show>
-
-        <Show when={audioObject() && soundEnabled()}>
-          <div class="mt-4 flex justify-center">
-            <button
-              class="py-2 px-6 bg-blue-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-              onClick={handleAudioControl}
-            >
-              {isPlaying() ? 'إيقاف الصوت' : 'تشغيل الصوت'}
-            </button>
           </div>
         </Show>
       </div>
