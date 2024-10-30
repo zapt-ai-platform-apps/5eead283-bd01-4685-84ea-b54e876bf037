@@ -1,5 +1,8 @@
 import { createSignal, Show, onMount } from 'solid-js';
 import { createEvent } from './supabaseClient';
+import Instructions from './components/Instructions';
+import InputArea from './components/InputArea';
+import ResponseArea from './components/ResponseArea';
 
 function App() {
   const [loading, setLoading] = createSignal(false);
@@ -179,8 +182,8 @@ function App() {
   return (
     <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
       <div class="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-8 h-full">
-        <div class="flex justify-between items-center mb-6">
-          <div class="text-center">
+        <div class="flex justify-between items-center mb-6 relative">
+          <div class="text-center w-full">
             <h1 class="text-4xl font-extrabold mb-2 text-purple-700">
               Blind Assistant
             </h1>
@@ -189,79 +192,27 @@ function App() {
             </p>
           </div>
           <button
-            class="text-purple-700 font-semibold cursor-pointer"
+            class="text-purple-700 font-semibold cursor-pointer absolute top-4 right-4"
             onClick={toggleInstructions}
           >
             كيفية الاستخدام
           </button>
         </div>
 
-        <Show when={showInstructions()}>
-          <div class="mb-6 p-4 bg-gray-100 rounded-lg shadow-inner overflow-y-auto">
-            <h2 class="text-2xl font-bold mb-4 text-purple-600">
-              كيفية الاستخدام
-            </h2>
-            <p class="text-gray-800 leading-relaxed mb-2">
-              يمكنك التفاعل مع الذكاء الاصطناعي عن طريق كتابة استفسارك في مربع
-              النص أو استخدام ميزة التسجيل الصوتي.
-            </p>
-            <ul class="list-disc list-inside text-gray-800 space-y-2">
-              <li>
-                للاستخدام الصوتي، اضغط على زر "تسجيل صوتي" وتحدث بوضوح.
-              </li>
-              <li>
-                أثناء التسجيل، يمكنك إيقافه بالضغط على زر "إيقاف التسجيل".
-              </li>
-              <li>
-                عند استخدام التسجيل الصوتي، يتم تشغيل الرد الصوتي تلقائيًا.
-              </li>
-              <li>
-                بعد انتهاء الرد الصوتي، سيبدأ التطبيق تلقائيًا في تسجيل صوتك
-                للاستفسار التالي.
-              </li>
-              <li>يمكنك نسخ الرد بالضغط على زر "نسخ الرد".</li>
-              <li>
-                للتحكم في الصوت أثناء الرد، استخدم زر "إيقاف الصوت" أو "تشغيل
-                الصوت".
-              </li>
-            </ul>
-            <button
-              class="mt-4 py-2 px-6 bg-red-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
-              onClick={toggleInstructions}
-            >
-              إغلاق
-            </button>
-          </div>
-        </Show>
+        <Instructions
+          showInstructions={showInstructions}
+          toggleInstructions={toggleInstructions}
+        />
 
-        <div class="space-y-4">
-          <textarea
-            placeholder="اكتب رسالتك هنا..."
-            value={textInput()}
-            onInput={(e) => setTextInput(e.target.value)}
-            class="w-full h-32 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent box-border resize-none text-gray-800"
-          ></textarea>
-          <div class="flex space-x-2">
-            <button
-              class={`flex-1 py-3 bg-purple-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer ${
-                loading() ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              onClick={handleTextSubmit}
-              disabled={loading()}
-            >
-              {loading() && !isRecording() ? 'جارٍ المعالجة...' : 'إرسال'}
-            </button>
-            <button
-              class={`flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
-                loading() ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-              onClick={isRecording() ? handleStopRecording : handleVoiceInput}
-              disabled={loading()}
-            >
-              {isRecording() ? 'إيقاف التسجيل' : 'تسجيل صوتي'}
-            </button>
-          </div>
-        </div>
+        <InputArea
+          textInput={textInput}
+          setTextInput={setTextInput}
+          isRecording={isRecording}
+          loading={loading}
+          handleTextSubmit={handleTextSubmit}
+          handleVoiceInput={handleVoiceInput}
+          handleStopRecording={handleStopRecording}
+        />
 
         <Show when={errorMessage()}>
           <div class="mt-4 text-red-500 text-center">{errorMessage()}</div>
@@ -271,33 +222,13 @@ function App() {
           <div class="mt-4 text-green-500 text-center">{successMessage()}</div>
         </Show>
 
-        <Show when={responseText()}>
-          <div class="mt-8 bg-gradient-to-r from-purple-200 to-blue-200 p-6 rounded-xl shadow-inner">
-            <h3 class="text-xl font-bold mb-2 text-purple-600 text-center">
-              الرد:
-            </h3>
-            <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">
-              {responseText()}
-            </p>
-            <div class="flex space-x-2 mt-4">
-              <button
-                class="flex-1 py-2 px-6 bg-green-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
-                onClick={handleCopyResponse}
-              >
-                نسخ الرد
-              </button>
-              <button
-                class={`flex-1 py-2 px-6 bg-blue-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
-                  loading() ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
-                onClick={handleAudioControl}
-                disabled={loading()}
-              >
-                {isPlaying() ? 'إيقاف الصوت' : 'تشغيل الصوت'}
-              </button>
-            </div>
-          </div>
-        </Show>
+        <ResponseArea
+          responseText={responseText}
+          isPlaying={isPlaying}
+          handleCopyResponse={handleCopyResponse}
+          handleAudioControl={handleAudioControl}
+          loading={loading}
+        />
       </div>
     </div>
   );
