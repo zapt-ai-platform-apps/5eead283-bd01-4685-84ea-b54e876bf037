@@ -9,6 +9,7 @@ function InputArea(props) {
     handleTextSubmit,
     handleVoiceInput,
     handleStopRecording,
+    setIsVoiceInput,
   } = props;
 
   return (
@@ -24,7 +25,10 @@ function InputArea(props) {
           class={`flex-1 py-3 bg-purple-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer ${
             loading() ? 'opacity-50 cursor-not-allowed' : ''
           }`}
-          onClick={handleTextSubmit}
+          onClick={() => {
+            setIsVoiceInput(false);
+            handleTextSubmit();
+          }}
           disabled={loading()}
         >
           {loading() && !isRecording() ? 'جارٍ المعالجة...' : 'إرسال'}

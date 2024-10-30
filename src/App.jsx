@@ -15,6 +15,7 @@ function App() {
   const [isRecording, setIsRecording] = createSignal(false);
   const [isPlaying, setIsPlaying] = createSignal(false);
   const [showInstructions, setShowInstructions] = createSignal(false);
+  const [isVoiceInput, setIsVoiceInput] = createSignal(false);
   let recognition;
 
   onMount(() => {
@@ -29,6 +30,7 @@ function App() {
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         setTextInput(transcript);
+        setIsVoiceInput(true);
         recognition.stop();
         setIsRecording(false);
         handleTextSubmit();
@@ -88,41 +90,48 @@ function App() {
       setResponseText(aiResult);
       setTextInput('');
 
-      const audioResult = await createEvent('text_to_speech', {
-        text: aiResult,
-      });
-      setAudioUrl(audioResult);
+      if (isVoiceInput()) {
+        const audioResult = await createEvent('text_to_speech', {
+          text: aiResult,
+        });
+        setAudioUrl(audioResult);
 
-      const audio = new Audio(audioResult);
-      setAudioObject(audio);
-      setIsPlaying(true);
+        const audio = new Audio(audioResult);
+        setAudioObject(audio);
+        setIsPlaying(true);
 
-      audio.onended = () => {
+        audio.onended = () => {
+          setIsPlaying(false);
+          setAudioObject(null);
+          handleVoiceInput();
+        };
+
+        audio.onerror = (e) => {
+          console.error('Error playing audio:', e);
+          setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
+          setIsPlaying(false);
+          setAudioObject(null);
+          handleVoiceInput();
+        };
+
+        audio.play().catch((error) => {
+          console.error('Error playing audio:', error);
+          setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
+          setIsPlaying(false);
+          setAudioObject(null);
+          handleVoiceInput();
+        });
+      } else {
+        // لا تقم بالرد الصوتي إذا كان الإدخال نصيًا
         setIsPlaying(false);
         setAudioObject(null);
-        handleVoiceInput();
-      };
-
-      audio.onerror = (e) => {
-        console.error('Error playing audio:', e);
-        setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
-        setIsPlaying(false);
-        setAudioObject(null);
-        handleVoiceInput();
-      };
-
-      audio.play().catch((error) => {
-        console.error('Error playing audio:', error);
-        setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
-        setIsPlaying(false);
-        setAudioObject(null);
-        handleVoiceInput();
-      });
+      }
     } catch (error) {
       console.error('Error processing text:', error);
       setErrorMessage('حدث خطأ أثناء معالجة النص.');
     } finally {
       setLoading(false);
+      setIsVoiceInput(false);
     }
   };
 
@@ -212,6 +221,7 @@ function App() {
           handleTextSubmit={handleTextSubmit}
           handleVoiceInput={handleVoiceInput}
           handleStopRecording={handleStopRecording}
+          setIsVoiceInput={setIsVoiceInput}
         />
 
         <Show when={errorMessage()}>
