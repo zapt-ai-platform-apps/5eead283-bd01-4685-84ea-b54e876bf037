@@ -1,6 +1,6 @@
 {
   "name": "blind-assistant",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "تطبيق عربي لمساعدة المكفوفين باستخدام الذكاء الاصطناعي",
   "type": "module",
   "scripts": {
@@ -11,7 +11,10 @@
   "dependencies": {
     "solid-js": "^1.8.22",
     "@zapt/zapt-js": "^1.0.5",
-    "@sentry/browser": "^7.59.0"
+    "@sentry/browser": "^7.59.0",
+    "@solidjs/router": "^0.8.4",
+    "solid-headless": "^1.0.0",
+    "@tailwindcss/forms": "^0.5.3"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",

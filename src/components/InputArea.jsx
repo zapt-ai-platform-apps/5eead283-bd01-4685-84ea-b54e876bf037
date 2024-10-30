@@ -10,6 +10,8 @@ function InputArea(props) {
     handleVoiceInput,
     handleStopRecording,
     setIsVoiceInput,
+    fontSize,
+    theme,
   } = props;
 
   return (
@@ -18,7 +20,9 @@ function InputArea(props) {
         placeholder="اكتب رسالتك هنا..."
         value={textInput()}
         onInput={(e) => setTextInput(e.target.value)}
-        class="w-full h-32 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent box-border resize-none text-gray-800"
+        class={`w-full h-32 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent box-border resize-none text-gray-800 ${
+          fontSize()
+        } ${theme() === 'dark' ? 'bg-gray-800 text-white border-gray-700' : ''}`}
       ></textarea>
       <div class="flex space-x-2">
         <button

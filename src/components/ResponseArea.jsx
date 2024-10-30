@@ -7,15 +7,23 @@ function ResponseArea(props) {
     handleCopyResponse,
     handleAudioControl,
     loading,
+    fontSize,
+    theme,
   } = props;
 
   return (
     <Show when={responseText()}>
-      <div class="mt-8 bg-gradient-to-r from-purple-200 to-blue-200 p-6 rounded-xl shadow-inner">
-        <h3 class="text-xl font-bold mb-2 text-purple-600 text-center">
-          الرد:
-        </h3>
-        <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">
+      <div
+        class={`mt-8 bg-gradient-to-r from-purple-200 to-blue-200 p-6 rounded-xl shadow-inner ${
+          theme() === 'dark' ? 'bg-gray-700' : ''
+        }`}
+      >
+        <h3 class="text-xl font-bold mb-2 text-purple-600 text-center">الرد:</h3>
+        <p
+          class={`text-gray-800 leading-relaxed whitespace-pre-wrap ${
+            fontSize()
+          } ${theme() === 'dark' ? 'text-white' : ''}`}
+        >
           {responseText()}
         </p>
         <div class="flex space-x-2 mt-4">

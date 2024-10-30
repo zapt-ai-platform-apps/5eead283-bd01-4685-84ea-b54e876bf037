@@ -3,6 +3,8 @@ import { createEvent } from './supabaseClient';
 import Instructions from './components/Instructions';
 import InputArea from './components/InputArea';
 import ResponseArea from './components/ResponseArea';
+import SettingsModal from './components/SettingsModal';
+import { Router } from '@solidjs/router';
 
 function App() {
   const [loading, setLoading] = createSignal(false);
@@ -15,10 +17,28 @@ function App() {
   const [isRecording, setIsRecording] = createSignal(false);
   const [isPlaying, setIsPlaying] = createSignal(false);
   const [showInstructions, setShowInstructions] = createSignal(false);
+  const [showSettings, setShowSettings] = createSignal(false);
   const [isVoiceInput, setIsVoiceInput] = createSignal(false);
+  const [autoPlayVoice, setAutoPlayVoice] = createSignal(true);
+  const [fontSize, setFontSize] = createSignal('text-base');
+  const [voiceSpeed, setVoiceSpeed] = createSignal(1);
+  const [theme, setTheme] = createSignal('light');
   let recognition;
 
   onMount(() => {
+    if (localStorage.getItem('autoPlayVoice')) {
+      setAutoPlayVoice(JSON.parse(localStorage.getItem('autoPlayVoice')));
+    }
+    if (localStorage.getItem('fontSize')) {
+      setFontSize(localStorage.getItem('fontSize'));
+    }
+    if (localStorage.getItem('voiceSpeed')) {
+      setVoiceSpeed(parseFloat(localStorage.getItem('voiceSpeed')));
+    }
+    if (localStorage.getItem('theme')) {
+      setTheme(localStorage.getItem('theme'));
+    }
+
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -90,13 +110,15 @@ function App() {
       setResponseText(aiResult);
       setTextInput('');
 
-      if (isVoiceInput()) {
+      if (isVoiceInput() && autoPlayVoice()) {
         const audioResult = await createEvent('text_to_speech', {
           text: aiResult,
+          speed: voiceSpeed(),
         });
         setAudioUrl(audioResult);
 
         const audio = new Audio(audioResult);
+        audio.playbackRate = voiceSpeed();
         setAudioObject(audio);
         setIsPlaying(true);
 
@@ -122,7 +144,7 @@ function App() {
           handleVoiceInput();
         });
       } else {
-        // لا تقم بالرد الصوتي إذا كان الإدخال نصيًا
+        // لا تقم بالرد الصوتي إذا كان الإدخال نصيًا أو التشغيل التلقائي معطل
         setIsPlaying(false);
         setAudioObject(null);
       }
@@ -157,6 +179,7 @@ function App() {
       }
     } else if (audioUrl()) {
       const audio = new Audio(audioUrl());
+      audio.playbackRate = voiceSpeed();
       setAudioObject(audio);
       setIsPlaying(true);
 
@@ -188,57 +211,107 @@ function App() {
     setShowInstructions(!showInstructions());
   };
 
+  const toggleSettings = () => {
+    setShowSettings(!showSettings());
+  };
+
+  const saveSettings = (newSettings) => {
+    setAutoPlayVoice(newSettings.autoPlayVoice);
+    setFontSize(newSettings.fontSize);
+    setVoiceSpeed(newSettings.voiceSpeed);
+    setTheme(newSettings.theme);
+
+    localStorage.setItem('autoPlayVoice', JSON.stringify(newSettings.autoPlayVoice));
+    localStorage.setItem('fontSize', newSettings.fontSize);
+    localStorage.setItem('voiceSpeed', newSettings.voiceSpeed);
+    localStorage.setItem('theme', newSettings.theme);
+
+    setShowSettings(false);
+  };
+
   return (
-    <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4">
-      <div class="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-8 h-full">
-        <div class="flex justify-between items-center mb-6 relative">
-          <div class="text-center w-full">
-            <h1 class="text-4xl font-extrabold mb-2 text-purple-700">
-              Blind Assistant
-            </h1>
-            <p class="text-lg text-gray-600">
-              تفاعل مع الذكاء الاصطناعي باللغة العربية بسهولة.
-            </p>
+    <div class={`${theme() === 'dark' ? 'dark' : ''}`}>
+      <div
+        class={`min-h-screen h-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4 ${
+          theme() === 'dark' ? 'bg-gray-800' : ''
+        }`}
+      >
+        <div
+          class={`w-full max-w-2xl ${
+            theme() === 'dark' ? 'bg-gray-900 text-white' : 'bg-white'
+          } rounded-3xl shadow-lg p-8 h-full`}
+        >
+          <div class="flex justify-between items-center mb-6 relative">
+            <div class="text-center w-full">
+              <h1 class="text-4xl font-extrabold mb-2 text-purple-700">
+                Blind Assistant
+              </h1>
+              <p class="text-lg text-gray-600">
+                تفاعل مع الذكاء الاصطناعي باللغة العربية بسهولة.
+              </p>
+            </div>
+            <div class="absolute top-4 right-4 flex space-x-2">
+              <button
+                class="text-purple-700 font-semibold cursor-pointer"
+                onClick={toggleInstructions}
+              >
+                كيفية الاستخدام
+              </button>
+              <button
+                class="text-purple-700 font-semibold cursor-pointer"
+                onClick={toggleSettings}
+              >
+                الإعدادات
+              </button>
+            </div>
           </div>
-          <button
-            class="text-purple-700 font-semibold cursor-pointer absolute top-4 right-4"
-            onClick={toggleInstructions}
-          >
-            كيفية الاستخدام
-          </button>
+
+          <SettingsModal
+            showSettings={showSettings}
+            toggleSettings={toggleSettings}
+            autoPlayVoice={autoPlayVoice}
+            fontSize={fontSize}
+            voiceSpeed={voiceSpeed}
+            theme={theme}
+            saveSettings={saveSettings}
+          />
+
+          <Instructions
+            showInstructions={showInstructions}
+            toggleInstructions={toggleInstructions}
+          />
+
+          <InputArea
+            textInput={textInput}
+            setTextInput={setTextInput}
+            isRecording={isRecording}
+            loading={loading}
+            handleTextSubmit={handleTextSubmit}
+            handleVoiceInput={handleVoiceInput}
+            handleStopRecording={handleStopRecording}
+            setIsVoiceInput={setIsVoiceInput}
+            fontSize={fontSize}
+            theme={theme}
+          />
+
+          <Show when={errorMessage()}>
+            <div class="mt-4 text-red-500 text-center">{errorMessage()}</div>
+          </Show>
+
+          <Show when={successMessage()}>
+            <div class="mt-4 text-green-500 text-center">{successMessage()}</div>
+          </Show>
+
+          <ResponseArea
+            responseText={responseText}
+            isPlaying={isPlaying}
+            handleCopyResponse={handleCopyResponse}
+            handleAudioControl={handleAudioControl}
+            loading={loading}
+            fontSize={fontSize}
+            theme={theme}
+          />
         </div>
-
-        <Instructions
-          showInstructions={showInstructions}
-          toggleInstructions={toggleInstructions}
-        />
-
-        <InputArea
-          textInput={textInput}
-          setTextInput={setTextInput}
-          isRecording={isRecording}
-          loading={loading}
-          handleTextSubmit={handleTextSubmit}
-          handleVoiceInput={handleVoiceInput}
-          handleStopRecording={handleStopRecording}
-          setIsVoiceInput={setIsVoiceInput}
-        />
-
-        <Show when={errorMessage()}>
-          <div class="mt-4 text-red-500 text-center">{errorMessage()}</div>
-        </Show>
-
-        <Show when={successMessage()}>
-          <div class="mt-4 text-green-500 text-center">{successMessage()}</div>
-        </Show>
-
-        <ResponseArea
-          responseText={responseText}
-          isPlaying={isPlaying}
-          handleCopyResponse={handleCopyResponse}
-          handleAudioControl={handleAudioControl}
-          loading={loading}
-        />
       </div>
     </div>
   );
