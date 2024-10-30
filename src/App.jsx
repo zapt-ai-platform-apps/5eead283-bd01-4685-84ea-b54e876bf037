@@ -12,7 +12,6 @@ function App() {
   const [isRecording, setIsRecording] = createSignal(false);
   const [isPlaying, setIsPlaying] = createSignal(false);
   const [showInstructions, setShowInstructions] = createSignal(false);
-  const [inputFromVoice, setInputFromVoice] = createSignal(false);
   let recognition;
 
   onMount(() => {
@@ -29,7 +28,6 @@ function App() {
         setTextInput(transcript);
         recognition.stop();
         setIsRecording(false);
-        setInputFromVoice(true);
         handleTextSubmit();
       };
 
@@ -91,9 +89,7 @@ function App() {
       audio.onended = () => {
         setIsPlaying(false);
         setAudioObject(null);
-        if (inputFromVoice()) {
-          handleVoiceInput();
-        }
+        handleVoiceInput();
       };
 
       audio.onerror = (e) => {
@@ -101,9 +97,7 @@ function App() {
         setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
         setIsPlaying(false);
         setAudioObject(null);
-        if (inputFromVoice()) {
-          handleVoiceInput();
-        }
+        handleVoiceInput();
       };
 
       audio.play().catch((error) => {
@@ -111,16 +105,13 @@ function App() {
         setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
         setIsPlaying(false);
         setAudioObject(null);
-        if (inputFromVoice()) {
-          handleVoiceInput();
-        }
+        handleVoiceInput();
       });
     } catch (error) {
       console.error('Error processing text:', error);
       setErrorMessage('حدث خطأ أثناء معالجة النص.');
     } finally {
       setLoading(false);
-      setInputFromVoice(false);
     }
   };
 
@@ -152,6 +143,7 @@ function App() {
       audio.onended = () => {
         setIsPlaying(false);
         setAudioObject(null);
+        handleVoiceInput();
       };
 
       audio.onerror = (e) => {
@@ -159,6 +151,7 @@ function App() {
         setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
         setIsPlaying(false);
         setAudioObject(null);
+        handleVoiceInput();
       };
 
       audio.play().catch((error) => {
@@ -166,6 +159,7 @@ function App() {
         setErrorMessage('حدث خطأ أثناء تشغيل الصوت.');
         setIsPlaying(false);
         setAudioObject(null);
+        handleVoiceInput();
       });
     }
   };
@@ -209,6 +203,10 @@ function App() {
               </li>
               <li>
                 عند استخدام التسجيل الصوتي، يتم تشغيل الرد الصوتي تلقائيًا.
+              </li>
+              <li>
+                بعد انتهاء الرد الصوتي، سيبدأ التطبيق تلقائيًا في تسجيل صوتك
+                للاستفسار التالي.
               </li>
               <li>يمكنك نسخ الرد بالضغط على زر "نسخ الرد".</li>
               <li>
