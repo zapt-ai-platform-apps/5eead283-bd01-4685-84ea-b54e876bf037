@@ -56,6 +56,14 @@ function App() {
     }
   };
 
+  const handleStopRecording = () => {
+    if (recognition && isRecording()) {
+      recognition.stop();
+      setIsRecording(false);
+      setErrorMessage('تم إيقاف التسجيل الصوتي.');
+    }
+  };
+
   const handleTextSubmit = async () => {
     if (!textInput().trim()) {
       setErrorMessage('يرجى إدخال نص.');
@@ -202,6 +210,9 @@ function App() {
                 للاستخدام الصوتي، اضغط على زر "تسجيل صوتي" وتحدث بوضوح.
               </li>
               <li>
+                أثناء التسجيل، يمكنك إيقافه بالضغط على زر "إيقاف التسجيل".
+              </li>
+              <li>
                 عند استخدام التسجيل الصوتي، يتم تشغيل الرد الصوتي تلقائيًا.
               </li>
               <li>
@@ -233,21 +244,21 @@ function App() {
           <div class="flex space-x-2">
             <button
               class={`flex-1 py-3 bg-purple-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer ${
-                loading() || isRecording() ? 'opacity-50 cursor-not-allowed' : ''
+                loading() ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               onClick={handleTextSubmit}
-              disabled={loading() || isRecording()}
+              disabled={loading()}
             >
               {loading() && !isRecording() ? 'جارٍ المعالجة...' : 'إرسال'}
             </button>
             <button
               class={`flex-1 py-3 bg-blue-600 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
-                isRecording() || loading() ? 'opacity-50 cursor-not-allowed' : ''
+                loading() ? 'opacity-50 cursor-not-allowed' : ''
               }`}
-              onClick={handleVoiceInput}
-              disabled={isRecording() || loading()}
+              onClick={isRecording() ? handleStopRecording : handleVoiceInput}
+              disabled={loading()}
             >
-              {isRecording() ? 'جارٍ التسجيل...' : 'تسجيل صوتي'}
+              {isRecording() ? 'إيقاف التسجيل' : 'تسجيل صوتي'}
             </button>
           </div>
         </div>
