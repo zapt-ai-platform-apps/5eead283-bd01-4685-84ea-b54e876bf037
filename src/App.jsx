@@ -230,7 +230,7 @@ function App() {
   return (
     <div class={`${theme() === 'dark' ? 'dark' : ''}`}>
       <div
-        class={`h-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4 ${
+        class={`min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4 ${
           theme() === 'dark' ? 'bg-gray-800 text-white' : 'text-gray-800'
         }`}
       >
