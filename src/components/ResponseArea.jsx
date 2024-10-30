@@ -37,7 +37,11 @@ function ResponseArea(props) {
             class={`flex-1 py-2 px-6 bg-blue-500 text-white rounded-xl font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
               loading() ? 'opacity-50 cursor-not-allowed' : ''
             }`}
-            onClick={handleAudioControl}
+            onClick={() => {
+              if (!loading()) {
+                handleAudioControl();
+              }
+            }}
             disabled={loading()}
           >
             {isPlaying() ? 'إيقاف الصوت' : 'تشغيل الصوت'}

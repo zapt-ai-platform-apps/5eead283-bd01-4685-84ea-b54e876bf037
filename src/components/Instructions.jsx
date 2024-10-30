@@ -5,7 +5,7 @@ function Instructions(props) {
 
   return (
     <Show when={showInstructions()}>
-      <div class="mb-6 p-4 bg-gray-100 rounded-lg shadow-inner overflow-y-auto">
+      <div class="mb-6 p-4 bg-gray-100 rounded-lg shadow-inner overflow-y-auto h-full">
         <h2 class="text-2xl font-bold mb-4 text-purple-600">كيفية الاستخدام</h2>
         <p class="text-gray-800 leading-relaxed mb-2">
           يمكنك التفاعل مع الذكاء الاصطناعي عن طريق كتابة استفسارك في مربع

@@ -50,7 +50,7 @@ function SettingsModal(props) {
               <select
                 value={localFontSize()}
                 onInput={(e) => setLocalFontSize(e.target.value)}
-                class="w-full p-2 border border-gray-300 rounded box-border"
+                class="w-full p-2 border border-gray-300 rounded box-border cursor-pointer"
               >
                 <option value="text-sm">صغير</option>
                 <option value="text-base">متوسط</option>
@@ -76,7 +76,7 @@ function SettingsModal(props) {
               <select
                 value={localTheme()}
                 onInput={(e) => setLocalTheme(e.target.value)}
-                class="w-full p-2 border border-gray-300 rounded box-border"
+                class="w-full p-2 border border-gray-300 rounded box-border cursor-pointer"
               >
                 <option value="light">فاتح</option>
                 <option value="dark">داكن</option>
