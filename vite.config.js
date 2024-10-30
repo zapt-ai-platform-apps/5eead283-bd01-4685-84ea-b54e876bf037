@@ -5,12 +5,12 @@ export default defineConfig({
   plugins: [solidPlugin()],
   build: {
     target: 'esnext',
-    polyfillDynamicImport: false,
+    polyfillDynamicImport: false
   },
   resolve: {
-    conditions: ['development', 'browser'],
+    conditions: ['development', 'browser']
   },
   optimizeDeps: {
-    exclude: [],
-  },
+    exclude: []
+  }
 });

@@ -103,7 +103,7 @@ function App() {
       const prompt = `يرجى الإجابة على السؤال التالي باللغة العربية الفصحى وبطريقة جذابة ومبسطة: ${textInput()}`;
       const aiResult = await createEvent('chatgpt_request', {
         prompt: prompt,
-        response_type: 'text',
+        response_type: 'text'
       });
 
       setResponseText(aiResult);
@@ -112,7 +112,7 @@ function App() {
       if (isVoiceInput() && autoPlayVoice()) {
         const audioResult = await createEvent('text_to_speech', {
           text: aiResult,
-          speed: voiceSpeed(),
+          speed: voiceSpeed()
         });
         setAudioUrl(audioResult);
 
@@ -230,7 +230,7 @@ function App() {
   return (
     <div class={`${theme() === 'dark' ? 'dark' : ''}`}>
       <div
-        class={`min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4 ${
+        class={`min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-4 ${
           theme() === 'dark' ? 'bg-gray-800 text-white' : 'text-gray-800'
         }`}
       >

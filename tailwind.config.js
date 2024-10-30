@@ -4,9 +4,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Tahoma", "sans-serif"],
-      },
-    },
+        sans: ["Tahoma", "sans-serif"]
+      }
+    }
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [require("@tailwindcss/forms")]
 };

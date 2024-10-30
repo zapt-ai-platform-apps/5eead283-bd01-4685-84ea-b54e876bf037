@@ -8,13 +8,13 @@ function ResponseArea(props) {
     handleAudioControl,
     loading,
     fontSize,
-    theme,
+    theme
   } = props;
 
   return (
     <Show when={responseText()}>
       <div
-        class={`mt-8 bg-gradient-to-r from-purple-200 to-blue-200 p-6 rounded-xl shadow-inner ${
+        class={`mt-8 bg-gradient-to-r from-gray-100 to-gray-200 p-6 rounded-xl shadow-inner ${
           theme() === 'dark' ? 'bg-gray-700' : ''
         }`}
       >

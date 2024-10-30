@@ -8,11 +8,6 @@ body {
   color: #333;
 }
 
-/* تحسين مظهر الردود */
-.bg-response {
-  background: linear-gradient(to right, #e0c3fc, #8ec5fc);
-}
-
 /* الوضع الداكن */
 .dark body {
   background-color: #1a202c;

@@ -11,7 +11,7 @@ function InputArea(props) {
     handleStopRecording,
     setIsVoiceInput,
     fontSize,
-    theme,
+    theme
   } = props;
 
   return (
