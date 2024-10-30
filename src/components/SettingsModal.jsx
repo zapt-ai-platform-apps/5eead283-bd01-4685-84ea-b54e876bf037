@@ -1,4 +1,4 @@
-import { Show, createSignal, onMount } from 'solid-js';
+import { Show, createSignal } from 'solid-js';
 
 function SettingsModal(props) {
   const {
@@ -39,7 +39,7 @@ function SettingsModal(props) {
                 <input
                   type="checkbox"
                   checked={localAutoPlayVoice()}
-                  onChange={(e) => setLocalAutoPlayVoice(e.target.checked)}
+                  onInput={(e) => setLocalAutoPlayVoice(e.target.checked)}
                   class="cursor-pointer"
                 />
                 <span>تشغيل الرد الصوتي تلقائيًا</span>
@@ -49,8 +49,8 @@ function SettingsModal(props) {
               <label class="block mb-1">حجم الخط:</label>
               <select
                 value={localFontSize()}
-                onChange={(e) => setLocalFontSize(e.target.value)}
-                class="w-full p-2 border border-gray-300 rounded"
+                onInput={(e) => setLocalFontSize(e.target.value)}
+                class="w-full p-2 border border-gray-300 rounded box-border"
               >
                 <option value="text-sm">صغير</option>
                 <option value="text-base">متوسط</option>
@@ -75,8 +75,8 @@ function SettingsModal(props) {
               <label class="block mb-1">الوضع :</label>
               <select
                 value={localTheme()}
-                onChange={(e) => setLocalTheme(e.target.value)}
-                class="w-full p-2 border border-gray-300 rounded"
+                onInput={(e) => setLocalTheme(e.target.value)}
+                class="w-full p-2 border border-gray-300 rounded box-border"
               >
                 <option value="light">فاتح</option>
                 <option value="dark">داكن</option>

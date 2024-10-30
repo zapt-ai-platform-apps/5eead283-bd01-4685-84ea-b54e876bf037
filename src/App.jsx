@@ -4,7 +4,6 @@ import Instructions from './components/Instructions';
 import InputArea from './components/InputArea';
 import ResponseArea from './components/ResponseArea';
 import SettingsModal from './components/SettingsModal';
-import { Router } from '@solidjs/router';
 
 function App() {
   const [loading, setLoading] = createSignal(false);
@@ -144,7 +143,6 @@ function App() {
           handleVoiceInput();
         });
       } else {
-        // لا تقم بالرد الصوتي إذا كان الإدخال نصيًا أو التشغيل التلقائي معطل
         setIsPlaying(false);
         setAudioObject(null);
       }
@@ -233,7 +231,7 @@ function App() {
     <div class={`${theme() === 'dark' ? 'dark' : ''}`}>
       <div
         class={`min-h-screen h-full bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center p-4 ${
-          theme() === 'dark' ? 'bg-gray-800' : ''
+          theme() === 'dark' ? 'bg-gray-800 text-white' : 'text-gray-800'
         }`}
       >
         <div
